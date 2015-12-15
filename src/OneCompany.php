@@ -85,5 +85,10 @@ class OneCompany extends PluginBase implements Listener
 						$sender->sendMessage(Color:: YELLOW. "[OneCompany] 이 회사를 다니는 유저목록을 보여줍니다.")
 					case "페쇠" :
 						$this->config;
-						$sender->sendMessage(Color::YELLOW."[OneCompany] 회사가 사장 %player%님에 의하여 페쇠되었습니다.");
+						$sender->sendMessage(Color::YELLOW."[OneCompany] 회사가 사장 {$sender->getName()}님에 의하여 페쇠되었습니다.");
 						break;
+				}
+			}
+		}
+	}
+}
