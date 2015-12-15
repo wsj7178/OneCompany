@@ -30,17 +30,16 @@ class OneCompany extends PluginBase implements Listener
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 		}
 		$this->economy = EconomyAPI::getInstance();
-	}
-	$this->NoticeVersionLisence();
-	$this->Loadconfig();
-	$this->CompanyDB = $this->Loadplugindata("CompanyDB.json");
-	$this->getServer()->getPluginManager()->registerEvent($this, $this);
-	$commandmap = $this->getServer()->getCommandMap();
-	$command = new PluginCommand("회사", $this);
-	$command->setDescription("회사를 개설합니다.");
-	$command->setUsage("사용법 : /회사 생성 | 양도 | 목록 | 회사원추가 | 회사원목록 | 폐쇠");
-	$command->setPermission("Company.command.allow");
-	$command->register("회사", $command);
+		$this->NoticeVersionLisence();
+		$this->Loadconfig();
+		$this->CompanyDB = $this->Loadplugindata("CompanyDB.json");
+		$this->getServer()->getPluginManager()->registerEvent($this, $this);
+		$commandmap = $this->getServer()->getCommandMap();
+		$command = new PluginCommand("회사", $this);
+		$command->setDescription("회사를 개설합니다.");
+		$command->setUsage("사용법 : /회사 생성 | 양도 | 목록 | 회사원추가 | 회사원목록 | 폐쇠");
+		$command->setPermission("Company.command.allow");
+		$command->register("회사", $command);
 	}
 	public function onDisable()
 	{
