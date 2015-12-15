@@ -30,7 +30,6 @@ class OneCompany extends PluginBase implements Listener
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 		}
 		$this->economy = EconomyAPI::getInstance();
-		$this->NoticeVersionLisence();
 		$this->Loadconfig();
 		$this->CompanyDB = $this->Loadplugindata("CompanyDB.json");
 		$this->getServer()->getPluginManager()->registerEvent($this, $this);
