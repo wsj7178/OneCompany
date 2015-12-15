@@ -23,15 +23,13 @@ class OneCompany extends PluginBase implements Listener
 	public function onEnable()
 	{
 		
-		$this->Company = (new Config($this->getDataFolder()."Company.json", Config::JSON))->getAll();
-		@mkdir ( $this->getDataFolder() );
+		$this->CompanyDB = (new Config($this->getDataFolder()."Company.json", Config::JSON))->getAll();
 		if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") == null){
 		    $this->getLogger()->error($this->get("cant-find-economyapi"));
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 		}
 		$this->economy = EconomyAPI::getInstance();
 		$this->Loadconfig();
-		$this->CompanyDB = $this->Loadplugindata("CompanyDB.json");
 		$this->getServer()->getPluginManager()->registerEvent($this, $this);
 		$commandmap = $this->getServer()->getCommandMap();
 		$command = new PluginCommand("회사", $this);
@@ -43,7 +41,7 @@ class OneCompany extends PluginBase implements Listener
 	public function onDisable()
 	{
 		$company = new Config($this->getDataFolder()."Company.json", Config::JSON);
-		$company->setAll($this->companyDB);
+		$company->setAll($this->CompanyDB);
 		$company->save();
 	}
 	public function Loadconfig()
