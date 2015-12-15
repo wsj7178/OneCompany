@@ -64,7 +64,7 @@ class OneCompany extends PluginBase implements Listener
 		{
 			if(strtolower($command) == "회사"){
 				if (!isset($args[0])){
-					$sender->sendMessage(Color::RED."[OneCompany] /회사 생성 <이름> | 양도 | 폐쇠 | ");
+					$sender->sendMessage(Color::RED."[OneCompany] /회사 생성 <이름> | 양도 | 목록 | 회사원추가 | 회사원목록 | 폐쇠 | ");
 			 	return true;
 				}
 				switch ($args[0]	){
@@ -80,9 +80,12 @@ class OneCompany extends PluginBase implements Listener
 					case "목록" :
 						$this->config;
 						$sender->sendMessage(Color:: YELLOW. "[OneCompany] 본인이 소유한 회사목록을 보여줍니다.");
+					case "회사원추가" :
+						$this->config;
+						$sender->sendMessage(Color:: YELLOW. "[OneCompany] {$sender->getName()}님이 회사에 추가되었습니다.");
 					case "회사원목록" :
 						$this->config;
-						$sender->sendMessage(Color:: YELLOW. "[OneCompany] 이 회사를 다니는 유저목록을 보여줍니다.")
+						$sender->sendMessage(Color:: YELLOW. "[OneCompany] 이 회사를 다니는 유저목록을 보여줍니다.");
 					case "페쇠" :
 						$this->config;
 						$sender->sendMessage(Color::YELLOW."[OneCompany] 회사가 사장 {$sender->getName()}님에 의하여 페쇠되었습니다.");
@@ -91,4 +94,3 @@ class OneCompany extends PluginBase implements Listener
 			}
 		}
 	}
-}
