@@ -83,10 +83,13 @@ class OneCompany extends PluginBase implements Listener {
 					if(!isset($args[1])) {
 						$this->alert($sender, "/회사 생성 <회사명>");
 						break;
+					} else if (!$sender instanceof Player) {
+						$this->alert($sender, $this->get("only-in-game"));
+						break;
 					}
 					$money = $this->economyAPI->myMoney($sender);
 					if ($money < $this->CompanyPrice ["create-price"] ) {
-				        $this->alert ($sender, $this->get ( "not-enough-money-to-purchase" ) . " ( " . $this->get ( "my-money" ) . " : " . $money . " )" );
+				        $this->alert($sender, str_replace("%money%", $money, $this->get("not-enough-money-to-purchase")));
 				        break;
 			        } 
 					$this->economyAPI->reduceMoney ( $sender, $this->config["create-price"] );  
