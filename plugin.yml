@@ -10,4 +10,4 @@ api:
 permissions:
  Company.command.allow:
   description: "company command permission"
-  default: OP
+  default: ture
