@@ -1,0 +1,14 @@
+# IF YOU NEED A SOME OTHER LANGUAGE SETTINGS #
+# YOU SHOULD MODIFY THIS MESSAGE.YML FILE -! #
+
+#PLEASE SET HERE TO YOUR LANGUAGE PREFIX
+default-language: ko
+m_version: 5
+
+#(EN) ENGLISH
+
+#(KO) KOREAN
+ko-there-are-no-economyapi: "EconomyAPI 플러그인을 찾을 수 없습니다."
+ko-my-money: "보유금액"
+ko-not-enough-money-to-purchase: "보유한 금액이 부족합니다."
+ko-default-prefix: "[ 서버 ]"
