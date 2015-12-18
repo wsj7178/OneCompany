@@ -9,8 +9,6 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\command\PluginCommand;
 use pocketmine\utils\Config;
-use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\Event;
 use pocketmine\Player;
 
 class OneCompany extends PluginBase implements Listener {
@@ -20,7 +18,7 @@ class OneCompany extends PluginBase implements Listener {
 	public $CompanyPrice;
 	private $config;
 	private $CompanyDB;
-	private $economy;
+	private $m_version = 5; //메세지의 버전
 
 	public function onEnable()
 	{
@@ -41,8 +39,7 @@ class OneCompany extends PluginBase implements Listener {
 		$command->setPermission("Company.command.allow");
 		$commandMap->register("회사", $command);
 		$this->saveResource ( "config.yml", false );
-		$this->CompanyPrice = (new Config ( $this->getDataFolder () . "CompanyPrice.yml", Config::YAML ))->getAll ();
-		$money = $this->economyAPI->myMoney ( $player );
+		$this->CompanyPrice = (new Config ( $this->getDataFolder () . "Config.yml", Config::YAML ))->getAll ();
 	}
 	public function onDisable()
 	{
@@ -78,22 +75,23 @@ class OneCompany extends PluginBase implements Listener {
 	{
 		if(strtolower($command) == "회사"){
 			if (!isset($args[0])){
-				$sender->sendMessage(Color::RED."[OneCompany] /회사 생성 | 양도 | 목록 | 회사원추가 | 회사원목록 | 폐쇠");
+				$this->alert($sender, "/회사 생성 | 양도 | 목록 | 회사원추가 | 회사원목록 | 폐쇠");
 		 		return true;
 			}
 			switch ($args[0]	){
 				case "생성" :
 					if(!isset($args[1])) {
-						$sender->sendMessage(Color::RED."[OneCompany] /회사 생성 <회사명>");
+						$this->alert($sender, "/회사 생성 <회사명>");
 						break;
 					}
+					$money = $this->economyAPI->myMoney($sender);
 					if ($money < $this->CompanyPrice ["create-price"] ) {
-				        $this->alert ($player, $this->get ( "not-enough-money-to-purchase" ) . " ( " . $this->get ( "my-money" ) . " : " . $money . " )" );
+				        $this->alert ($sender, $this->get ( "not-enough-money-to-purchase" ) . " ( " . $this->get ( "my-money" ) . " : " . $money . " )" );
 				        break;
 			        } 
 					$this->economyAPI->reduceMoney ( $sender, $this->config["create-price"] );  
 					$this->CompanyDB[$args[2]]["owner"] = $sender->getName();
-					$sender->sendMessage(Color::YELLOW."[OneCompany] 회사가 생성 되었습니다.");
+					$this->message($sender, "회사가 생성 되었습니다.");
 					break;
 				case "양도" :
 					$this->config;
@@ -119,8 +117,22 @@ class OneCompany extends PluginBase implements Listener {
 		}
 		return true;
 	}
-	public function message($player, $text = "", $mark = null) {
+	public function message($player, $text = "", $mark = NULL) {
+		if(!$player instanceof Player){
+			$player = $this->getServer()->getPlayer($player);
+		}
+		if($mark === NULL){
+			$mark = $this->get("default-prefix");
+		}
+		$player->sendMessage(Color::DARK_AQUA.$mark." ".$text);
 	}
 	public function alert($player, $text = "", $mark = null) {
+		if(!$player instanceof Player){
+			$player = $this->getServer()->getPlayer($player);
+		}
+		if($mark === NULL){
+			$mark = $this->get("default-prefix");
+		}
+		$player->sendMessage(Color::RED.$mark." ".$text);
 	}
 }
