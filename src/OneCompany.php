@@ -9,34 +9,40 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\command\PluginCommand;
 use pocketmine\utils\Config;
-use onebone\economyapi\EconomyAPI;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\Event;
+use pocketmine\Player;
 
-class OneCompany extends PluginBase implements Listener
-{
-	
+class OneCompany extends PluginBase implements Listener {
+	private static $instance = null;
+	public $messages;
+	public $economyAPI = null;
+	public $CompanyPrice;
 	private $config;
 	private $CompanyDB;
 	private $economy;
 
 	public function onEnable()
 	{
-		
+		$this->initMessage ();
 		$this->CompanyDB = (new Config($this->getDataFolder()."Company.json", Config::JSON))->getAll();
-		if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") == null){
-		    $this->getLogger()->error($this->get("cant-find-economyapi"));
-			$this->getServer()->getPluginManager()->disablePlugin($this);
+		
+		if ($this->getServer ()->getPluginManager ()->getPlugin ( "EconomyAPI" ) != null) {
+			$this->economyAPI = \onebone\economyapi\EconomyAPI::getInstance ();
+		} else {
+			$this->getLogger ()->error ( $this->get ( "there-are-no-economyapi" ) );
+			$this->getServer ()->getPluginManager ()->disablePlugin ( $this );
 		}
-		$this->economy = EconomyAPI::getInstance();
-		$this->Loadconfig();
-		$this->getServer()->getPluginManager()->registerEvent($this, $this);
-		$commandmap = $this->getServer()->getCommandMap();
+		
+		$commandMap = $this->getServer()->getCommandMap();
 		$command = new PluginCommand("회사", $this);
 		$command->setDescription("회사를 개설합니다.");
 		$command->setUsage("사용법 : /회사 생성 | 양도 | 목록 | 회사원추가 | 회사원목록 | 폐쇠");
 		$command->setPermission("Company.command.allow");
-		$command->register("회사", $command);
+		$commandMap->register("회사", $command);
+		$this->saveResource ( "config.yml", false );
+		$this->CompanyPrice = (new Config ( $this->getDataFolder () . "CompanyPrice.yml", Config::YAML ))->getAll ();
+		$money = $this->economyAPI->myMoney ( $player );
 	}
 	public function onDisable()
 	{
@@ -44,11 +50,24 @@ class OneCompany extends PluginBase implements Listener
 		$company->setAll($this->CompanyDB);
 		$company->save();
 	}
-	public function Loadconfig()
-	{
-		$this->saveResource("config.yml");
-		$this->config = (new Config($this->getDataFolder()."config.yml", Config::YAML))->getAll();
+	
+	public function get($var) {
+		return $this->messages [$this->messages ["default-language"] . "-" . $var];
 	}
+	public function initMessage() {
+		$this->saveResource ( "messages.yml", false );
+		$this->messagesUpdate ( "messages.yml" );
+		$this->messages = (new Config ( $this->getDataFolder () . "messages.yml", Config::YAML ))->getAll ();
+	}
+	public function messagesUpdate($targetYmlName) {
+		$targetYml = (new Config ( $this->getDataFolder () . $targetYmlName, Config::YAML ))->getAll ();
+		if (! isset ( $targetYml ["m_version"] )) {
+			$this->saveResource ( $targetYmlName, true );
+		} else if ($targetYml ["m_version"] < $this->m_version) {
+			$this->saveResource ( $targetYmlName, true );
+		}
+	}
+	
 	public function NoticeLisence()
 	{
 		$this->getLogger()->alert("본 플러그인은 Light-EULA를 사용합니다.");
@@ -64,17 +83,15 @@ class OneCompany extends PluginBase implements Listener
 			}
 			switch ($args[0]	){
 				case "생성" :
-					if(!isset($args[1])){
+					if(!isset($args[1])) {
 						$sender->sendMessage(Color::RED."[OneCompany] /회사 생성 <회사명>");
 						break;
-					} else if ($this->economy->myMoney($sender) < $this->config["create-price"]) {
-						$sender->sendMessage(Color::RED."[OneCompany] 돈이 부족합니다!");
-						break;
-					} else if ($sender instanceof Player) {
-						$sender->sendMessage(Color::RED."[OneCompany] 회사 생성은 서버 내에서만 가능합니다.");
-						break;
 					}
-					$this->economy->reduceMoney ( $sender, $this->config["create-price"] );
+					if ($money < $this->CompanyPrice ["create-price"] ) {
+				        $this->alert ($player, $this->get ( "not-enough-money-to-purchase" ) . " ( " . $this->get ( "my-money" ) . " : " . $money . " )" );
+				        break;
+			        } 
+					$this->economyAPI->reduceMoney ( $sender, $this->config["create-price"] );  
 					$this->CompanyDB[$args[2]]["owner"] = $sender->getName();
 					$sender->sendMessage(Color::YELLOW."[OneCompany] 회사가 생성 되었습니다.");
 					break;
@@ -85,12 +102,15 @@ class OneCompany extends PluginBase implements Listener
 				case "목록" :
 					$this->config;
 					$sender->sendMessage(Color:: YELLOW. "[OneCompany] 본인이 소유한 회사목록을 보여줍니다.");
+				    break;
 				case "회사원추가" :
 					$this->config;
 					$sender->sendMessage(Color:: YELLOW. "[OneCompany] {$sender->getName()}님이 회사에 추가되었습니다.");
+				    break;
 				case "회사원목록" :
 					$this->config;
 					$sender->sendMessage(Color:: YELLOW. "[OneCompany] 이 회사를 다니는 유저목록을 보여줍니다.");
+				    break;
 				case "페쇠" :
 					$this->config;
 					$sender->sendMessage(Color::YELLOW."[OneCompany] 회사가 사장 {$sender->getName()}님에 의하여 페쇠되었습니다.");
@@ -98,5 +118,9 @@ class OneCompany extends PluginBase implements Listener
 			}
 		}
 		return true;
+	}
+	public function message($player, $text = "", $mark = null) {
+	}
+	public function alert($player, $text = "", $mark = null) {
 	}
 }
