@@ -93,7 +93,7 @@ class OneCompany extends PluginBase implements Listener {
 				        break;
 			        } 
 					$this->economyAPI->reduceMoney ( $sender, $this->config["create-price"] );  
-					$this->CompanyDB[$args[2]]["owner"] = $sender->getName();
+					$this->CompanyDB[$args[1]]["owner"] = $sender->getName();
 					$this->message($sender, "회사가 생성 되었습니다.");
 					break;
 				case "양도" :
